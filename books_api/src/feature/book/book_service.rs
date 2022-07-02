@@ -3,7 +3,7 @@ use std::error::Error;
 use async_trait::async_trait;
 use uuid::Uuid;
 
-use crate::feature::book::ports::{Book, BookCreateInput, BookList, BookRepo, BookService};
+use crate::feature::book::ports::{Book, BookCreateInput, BookList, BookRepo, BookService, BookUpdateInput};
 
 pub struct BookServiceImpl<A: BookRepo> {
     pub book_repo: A,
@@ -21,5 +21,11 @@ impl<A> BookService for BookServiceImpl<A> where A: BookRepo + Sync + Send {
 
     async fn get_all(&self) -> Result<BookList, Box<dyn Error>> {
         self.book_repo.find_all().await
+    }
+
+    async fn update(&self, id: &Uuid, book_update_input: &BookUpdateInput) -> Result<(), Box<dyn Error>> {
+        let prev = self.book_repo.find_one(id).await?;
+        let updated = book_update_input.to_model(&prev);
+        self.book_repo.update_one(&updated).await
     }
 }

@@ -45,6 +45,28 @@ impl BookCreateInput {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct BookUpdateInput {
+    pub name: Option<String>,
+    pub url: Option<Url>,
+}
+
+impl BookUpdateInput {
+    pub fn to_model(&self, prev: &Book) -> Book {
+        Book {
+            id: prev.id.clone(),
+            name: match &self.name {
+                Some(n) => n.clone(),
+                None => prev.name.clone(),
+            },
+            url: match &self.url {
+                Some(u) => Some(u.clone()),
+                None => prev.url.clone(),
+            },
+        }
+    }
+}
+
 pub type BookList = Vec<Book>;
 
 #[async_trait]
@@ -52,6 +74,7 @@ pub trait BookService {
     async fn register(&self, book_create_input: &BookCreateInput) -> Result<(), Box<dyn std::error::Error>>;
     async fn get_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn get_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
+    async fn update(&self, id: &Uuid, book_update_input: &BookUpdateInput) -> Result<(), Box<dyn std::error::Error>>;
 }
 
 #[async_trait]
@@ -59,5 +82,6 @@ pub trait BookRepo {
     async fn create(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;
     async fn find_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn find_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
+    async fn update_one(&self, book: &book) -> Result<(), Box<dyn std::error::Error>>;
 }
 
