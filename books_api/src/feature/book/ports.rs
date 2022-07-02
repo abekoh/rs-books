@@ -26,11 +26,30 @@ impl Book {
     }
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
+pub struct BookCreateInput {
+    pub name: String,
+    pub url: Option<Url>,
+}
+
+impl BookCreateInput {
+    pub fn to_model(&self) -> Book {
+        Book {
+            id: Uuid::new_v4(),
+            name: self.name.clone(),
+            url: match &self.url {
+                Some(u) => Some(u.clone()),
+                None => None,
+            },
+        }
+    }
+}
+
 pub type BookList = Vec<Book>;
 
 #[async_trait]
 pub trait BookService {
-    async fn register(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;
+    async fn register(&self, book_create_input: &BookCreateInput) -> Result<(), Box<dyn std::error::Error>>;
     async fn get_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn get_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
 }
@@ -41,3 +60,4 @@ pub trait BookRepo {
     async fn find_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn find_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
 }
+

@@ -5,26 +5,7 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 use uuid::Uuid;
 
-use crate::feature::book::ports::{Book, BookService};
-
-#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
-pub struct BookCreateInput {
-    pub name: String,
-    pub url: Option<Url>,
-}
-
-impl BookCreateInput {
-    pub fn to_model(&self) -> Book {
-        Book {
-            id: Uuid::new_v4(),
-            name: self.name.clone(),
-            url: match &self.url {
-                Some(u) => Some(u.clone()),
-                None => None,
-            },
-        }
-    }
-}
+use crate::feature::book::ports::{Book, BookCreateInput, BookService};
 
 pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web::ServiceConfig) {
     cfg.app_data(service);
@@ -34,7 +15,7 @@ pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web:
 }
 
 async fn register<T: BookService>(service: web::Data<T>, body: Json<BookCreateInput>) -> impl Responder {
-    let res = service.register(&body.to_model()).await;
+    let res = service.register(&body).await;
     match res {
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(err) => match err {
