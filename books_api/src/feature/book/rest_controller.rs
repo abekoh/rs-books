@@ -1,10 +1,30 @@
 use actix_web::{HttpResponse, Responder, web};
 use actix_web::web::{Json, Path};
 use log::warn;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use url::Url;
 use uuid::Uuid;
 
 use crate::feature::book::ports::{Book, BookService};
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
+pub struct BookInput {
+    pub name: String,
+    pub url: Option<Url>,
+}
+
+impl BookInput {
+    pub fn to_model(&self) -> Book {
+        Book {
+            id: Uuid::new_v4(),
+            name: self.name.clone(),
+            url: match &self.url {
+                Some(u) => Some(u.clone()),
+                None => None,
+            },
+        }
+    }
+}
 
 pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web::ServiceConfig) {
     cfg.app_data(service);
@@ -13,8 +33,8 @@ pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web:
     cfg.route("/books/{id}", web::get().to(get_one::<T>));
 }
 
-async fn register<T: BookService>(service: web::Data<T>, body: Json<Book>) -> impl Responder {
-    let res = service.register(&body).await;
+async fn register<T: BookService>(service: web::Data<T>, body: Json<BookInput>) -> impl Responder {
+    let res = service.register(&body.to_model()).await;
     match res {
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(err) => match err {
