@@ -32,11 +32,12 @@ pub type BookList = Vec<Book>;
 pub trait BookService {
     async fn register(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;
     async fn get_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
+    async fn get_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
 }
 
 #[async_trait]
 pub trait BookRepo {
     async fn create(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;
     async fn find_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
-    async fn find_all(&self, id: &Uuid) -> Result<BookList, Box<dyn std::error::Error>>;
+    async fn find_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
 }

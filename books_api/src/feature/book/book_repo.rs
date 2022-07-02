@@ -53,8 +53,6 @@ impl BookDto {
     }
 }
 
-type BookDtoList = Vec<BookDto>;
-
 #[async_trait]
 impl BookRepo for PostgresBookRepo {
     async fn create(&self, book: &Book) -> Result<(), Box<dyn Error>> {
@@ -91,8 +89,7 @@ impl BookRepo for PostgresBookRepo {
         }
     }
 
-    async fn find_all(&self, id: &Uuid) -> Result<BookList, Box<dyn Error>> {
-        let uid = sqlx::types::Uuid::from_bytes(*id.as_bytes());
+    async fn find_all(&self) -> Result<BookList, Box<dyn Error>> {
         let res = sqlx::query_as!(BookDto, "SELECT id, name, url, published_year, original_published_year FROM books ORDER BY updated_at DESC LIMIT 10")
             .fetch_all(&*self.pg_pool)
             .await;

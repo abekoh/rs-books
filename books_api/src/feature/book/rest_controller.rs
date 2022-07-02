@@ -9,6 +9,7 @@ use crate::feature::book::ports::{Book, BookService};
 pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web::ServiceConfig) {
     cfg.app_data(service);
     cfg.route("/books", web::post().to(register::<T>));
+    cfg.route("/books", web::get().to(get_all::<T>));
     cfg.route("/books/{id}", web::get().to(get_one::<T>));
 }
 
@@ -28,6 +29,19 @@ async fn register<T: BookService>(service: web::Data<T>, body: Json<Book>) -> im
 #[derive(Deserialize)]
 struct GetOnePath {
     id: Uuid,
+}
+
+async fn get_all<T: BookService>(service: web::Data<T>) -> impl Responder {
+    let res = service.get_all().await;
+    match res {
+        Ok(bs) => HttpResponse::Ok().json(bs),
+        Err(err) => match err {
+            e => {
+                warn!("{}", e);
+                HttpResponse::InternalServerError().finish()
+            }
+        }
+    }
 }
 
 async fn get_one<T: BookService>(service: web::Data<T>, path: Path<GetOnePath>) -> impl Responder {
