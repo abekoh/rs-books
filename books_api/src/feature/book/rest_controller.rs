@@ -29,7 +29,7 @@ async fn register<T: BookService>(service: web::Data<T>, body: Json<BookCreateIn
 }
 
 #[derive(Deserialize)]
-struct GetOnePath {
+struct OnePath {
     id: Uuid,
 }
 
@@ -46,7 +46,7 @@ async fn get_all<T: BookService>(service: web::Data<T>) -> impl Responder {
     }
 }
 
-async fn get_one<T: BookService>(service: web::Data<T>, path: Path<GetOnePath>) -> impl Responder {
+async fn get_one<T: BookService>(service: web::Data<T>, path: Path<OnePath>) -> impl Responder {
     let res = service.get_one(&path.id).await;
     match res {
         Ok(b) => HttpResponse::Ok().json(b),
@@ -59,7 +59,7 @@ async fn get_one<T: BookService>(service: web::Data<T>, path: Path<GetOnePath>) 
     }
 }
 
-async fn update<T: BookService>(service: web::Data<T>, path: Path<GetOnePath>, body: Json<BookUpdateInput>) -> impl Responder {
+async fn update<T: BookService>(service: web::Data<T>, path: Path<OnePath>, body: Json<BookUpdateInput>) -> impl Responder {
     let res = service.update(&path.id, &body).await;
     match res {
         Ok(_) => HttpResponse::NoContent().finish(),
