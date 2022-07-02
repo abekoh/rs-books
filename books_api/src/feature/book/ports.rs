@@ -26,6 +26,8 @@ impl Book {
     }
 }
 
+pub type BookList = Vec<Book>;
+
 #[async_trait]
 pub trait BookService {
     async fn register(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;

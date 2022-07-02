@@ -88,4 +88,15 @@ impl BookRepo for PostgresBookRepo {
             Err(e) => Err(Box::from(e))
         }
     }
+
+    async fn find_all(&self, id: &Uuid) -> Result<Book, Box<dyn Error>> {
+        let uid = sqlx::types::Uuid::from_bytes(*id.as_bytes());
+        let res = sqlx::query_as!(BookDto, "SELECT id, name, url, published_year, original_published_year FROM books WHERE id = $1", &uid)
+            .fetch_one(&*self.pg_pool)
+            .await;
+        match res {
+            Ok(b) => Ok(b.to_model()),
+            Err(e) => Err(Box::from(e))
+        }
+    }
 }
