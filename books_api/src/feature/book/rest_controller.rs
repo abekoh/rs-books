@@ -1,8 +1,8 @@
 use actix_web::{HttpResponse, Responder, web};
 use actix_web::web::{Json, Path};
 use log::warn;
-use serde::{Deserialize, Serialize};
-use url::Url;
+use serde::{Deserialize};
+
 use uuid::Uuid;
 
 use crate::feature::book::ports::{BookCreateInput, BookService, BookUpdateInput};

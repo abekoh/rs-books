@@ -18,10 +18,7 @@ impl Book {
         Self {
             id: Uuid::new_v4(),
             name: String::from(name),
-            url: match url {
-                Some(u) => Some(Url::from_str(u).unwrap()),
-                None => None
-            },
+            url: url.map(|u| Url::from_str(u).unwrap()),
         }
     }
 }
@@ -37,10 +34,7 @@ impl BookCreateInput {
         Book {
             id: Uuid::new_v4(),
             name: self.name.clone(),
-            url: match &self.url {
-                Some(u) => Some(u.clone()),
-                None => None,
-            },
+            url: self.url.as_ref().cloned(),
         }
     }
 }
@@ -54,7 +48,7 @@ pub struct BookUpdateInput {
 impl BookUpdateInput {
     pub fn to_model(&self, prev: &Book) -> Book {
         Book {
-            id: prev.id.clone(),
+            id: prev.id,
             name: match &self.name {
                 Some(n) => n.clone(),
                 None => prev.name.clone(),

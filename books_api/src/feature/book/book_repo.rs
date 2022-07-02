@@ -27,10 +27,7 @@ impl BookDto {
         let dto = BookDto {
             id: sqlx::types::Uuid::parse_str(&model.id.to_string())?,
             name: model.name.clone(),
-            url: match &model.url {
-                Some(url) => Some(url.to_string()),
-                None => None,
-            },
+            url: model.url.as_ref().map(|url| url.to_string()),
             published_year: None,
             original_published_year: None,
         };

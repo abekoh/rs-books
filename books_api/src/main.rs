@@ -30,7 +30,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 fn configure_features(pg_pool: Arc<PgPool>, cfg: &mut web::ServiceConfig) {
-    configure_book(pg_pool.clone(), cfg);
+    configure_book(pg_pool, cfg);
 }
 
 fn configure_book(pg_pool: Arc<PgPool>, cfg: &mut web::ServiceConfig) {
@@ -40,7 +40,7 @@ fn configure_book(pg_pool: Arc<PgPool>, cfg: &mut web::ServiceConfig) {
 
     let service = BookServiceImpl {
         book_repo: PostgresBookRepo {
-            pg_pool: pg_pool.clone()
+            pg_pool
         }
     };
     rest_controller::configure(web::Data::new(service), cfg);
