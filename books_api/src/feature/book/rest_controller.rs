@@ -8,12 +8,12 @@ use uuid::Uuid;
 use crate::feature::book::ports::{Book, BookService};
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
-pub struct BookInput {
+pub struct BookCreateInput {
     pub name: String,
     pub url: Option<Url>,
 }
 
-impl BookInput {
+impl BookCreateInput {
     pub fn to_model(&self) -> Book {
         Book {
             id: Uuid::new_v4(),
@@ -33,7 +33,7 @@ pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web:
     cfg.route("/books/{id}", web::get().to(get_one::<T>));
 }
 
-async fn register<T: BookService>(service: web::Data<T>, body: Json<BookInput>) -> impl Responder {
+async fn register<T: BookService>(service: web::Data<T>, body: Json<BookCreateInput>) -> impl Responder {
     let res = service.register(&body.to_model()).await;
     match res {
         Ok(_) => HttpResponse::NoContent().finish(),
