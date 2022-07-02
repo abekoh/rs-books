@@ -26,6 +26,6 @@ impl<A> BookService for BookServiceImpl<A> where A: BookRepo + Sync + Send {
     async fn update(&self, id: &Uuid, input: &BookUpdateInput) -> Result<(), Box<dyn Error>> {
         let prev = self.book_repo.find_one(id).await?;
         let updated = input.to_model(&prev);
-        self.book_repo.update_one(&updated).await
+        self.book_repo.update(&updated).await
     }
 }

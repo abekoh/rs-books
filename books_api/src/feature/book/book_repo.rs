@@ -104,7 +104,7 @@ impl BookRepo for PostgresBookRepo {
         }
     }
 
-    async fn update_one(&self, book: &Book) -> Result<(), Box<dyn Error>> {
+    async fn update(&self, book: &Book) -> Result<(), Box<dyn Error>> {
         let dto = BookDto::new(book)?;
         let _ = sqlx::query!("UPDATE books SET name = $1 WHERE id = $2", &dto.name, &dto.id)
             .execute(&*self.pg_pool)
