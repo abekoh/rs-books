@@ -53,10 +53,10 @@ impl BookDto {
     }
 }
 
-impl BookRepo {
-    fn update_nullable(&self, dto: &BookDto) -> Result<(), Box<dyn Error>> {
+impl PostgresBookRepo {
+    async fn update_nullable(&self, dto: &BookDto) -> Result<(), Box<dyn Error>> {
         if dto.url.is_some() {
-            let _ = sqlx::query!("UPDATE books SET url = $1 WHERE id = $2", &dto.url.unwrap(), &dto.id)
+            let _ = sqlx::query!("UPDATE books SET url = $1 WHERE id = $2", &dto.url.as_ref().unwrap(), &dto.id)
                 .execute(&*self.pg_pool)
                 .await?;
         }
@@ -81,7 +81,7 @@ impl BookRepo for PostgresBookRepo {
         let _ = sqlx::query!("INSERT INTO books (id, name) VALUES ($1, $2)", &dto.id, &dto.name)
             .execute(&*self.pg_pool)
             .await?;
-        self.update_nullable(&dto)?;
+        self.update_nullable(&dto).await?;
         Ok(())
     }
 
@@ -107,12 +107,12 @@ impl BookRepo for PostgresBookRepo {
         }
     }
 
-    async fn update_one(&self, book: &book) -> Result<(), Box<dyn Error>> {
+    async fn update_one(&self, book: &Book) -> Result<(), Box<dyn Error>> {
         let dto = BookDto::new(book)?;
         let _ = sqlx::query!("UPDATE books SET name = $1 WHERE id = $2", &dto.name, &dto.id)
             .execute(&*self.pg_pool)
             .await?;
-        self.update_nullable(&dto)?;
+        self.update_nullable(&dto).await?;
         Ok(())
     }
 }
