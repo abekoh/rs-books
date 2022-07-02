@@ -112,4 +112,12 @@ impl BookRepo for PostgresBookRepo {
         self.update_nullable(&dto).await?;
         Ok(())
     }
+
+    async fn delete(&self, id: &Uuid) -> Result<(), Box<dyn Error>> {
+        let uid = sqlx::types::Uuid::from_bytes(*id.as_bytes());
+        let _ = sqlx::query!("DELETE FROM books WHERE id = $1", &uid)
+            .execute(&*self.pg_pool)
+            .await?;
+        Ok(())
+    }
 }

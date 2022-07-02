@@ -13,6 +13,7 @@ pub fn configure<T: 'static + BookService>(service: web::Data<T>, cfg: &mut web:
     cfg.route("/books", web::get().to(get_all::<T>));
     cfg.route("/books/{id}", web::get().to(get_one::<T>));
     cfg.route("/books/{id}", web::put().to(update::<T>));
+    cfg.route("/books/{id}", web::delete().to(delete::<T>));
 }
 
 async fn register<T: BookService>(service: web::Data<T>, body: Json<BookCreateInput>) -> impl Responder {
@@ -61,6 +62,19 @@ async fn get_one<T: BookService>(service: web::Data<T>, path: Path<OnePath>) -> 
 
 async fn update<T: BookService>(service: web::Data<T>, path: Path<OnePath>, body: Json<BookUpdateInput>) -> impl Responder {
     let res = service.update(&path.id, &body).await;
+    match res {
+        Ok(_) => HttpResponse::NoContent().finish(),
+        Err(err) => match err {
+            e => {
+                warn!("{}", e);
+                HttpResponse::InternalServerError().finish()
+            }
+        }
+    }
+}
+
+async fn delete<T: BookService>(service: web::Data<T>, path: Path<OnePath>) -> impl Responder {
+    let res = service.delete(&path.id).await;
     match res {
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(err) => match err {

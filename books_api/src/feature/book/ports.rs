@@ -69,6 +69,7 @@ pub trait BookService {
     async fn get_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn get_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
     async fn update(&self, id: &Uuid, input: &BookUpdateInput) -> Result<(), Box<dyn std::error::Error>>;
+    async fn delete(&self, id: &Uuid) -> Result<(), Box<dyn std::error::Error>>;
 }
 
 #[async_trait]
@@ -77,5 +78,6 @@ pub trait BookRepo {
     async fn find_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn find_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
     async fn update(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;
+    async fn delete(&self, id: &Uuid) -> Result<(), Box<dyn std::error::Error>>;
 }
 

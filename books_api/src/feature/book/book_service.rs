@@ -28,4 +28,8 @@ impl<A> BookService for BookServiceImpl<A> where A: BookRepo + Sync + Send {
         let updated = input.to_model(&prev);
         self.book_repo.update(&updated).await
     }
+
+    async fn delete(&self, id: &Uuid) -> Result<(), Box<dyn Error>> {
+        self.book_repo.delete(id).await
+    }
 }
