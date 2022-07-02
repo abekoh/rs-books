@@ -11,7 +11,7 @@ pub struct BookServiceImpl<A: BookRepo> {
 
 #[async_trait]
 impl<A> BookService for BookServiceImpl<A> where A: BookRepo + Sync + Send {
-    async fn register(&self, book_create_input: &BookCreateInput) -> Result<(), Box<dyn Error>> {
+    async fn register(&self, input: &BookCreateInput) -> Result<(), Box<dyn Error>> {
         self.book_repo.create(&book_create_input.to_model()).await
     }
 
@@ -23,7 +23,7 @@ impl<A> BookService for BookServiceImpl<A> where A: BookRepo + Sync + Send {
         self.book_repo.find_all().await
     }
 
-    async fn update(&self, id: &Uuid, book_update_input: &BookUpdateInput) -> Result<(), Box<dyn Error>> {
+    async fn update(&self, id: &Uuid, input: &BookUpdateInput) -> Result<(), Box<dyn Error>> {
         let prev = self.book_repo.find_one(id).await?;
         let updated = book_update_input.to_model(&prev);
         self.book_repo.update_one(&updated).await

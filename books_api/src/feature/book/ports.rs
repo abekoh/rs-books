@@ -71,10 +71,10 @@ pub type BookList = Vec<Book>;
 
 #[async_trait]
 pub trait BookService {
-    async fn register(&self, book_create_input: &BookCreateInput) -> Result<(), Box<dyn std::error::Error>>;
+    async fn register(&self, input: &BookCreateInput) -> Result<(), Box<dyn std::error::Error>>;
     async fn get_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
     async fn get_all(&self) -> Result<BookList, Box<dyn std::error::Error>>;
-    async fn update(&self, id: &Uuid, book_update_input: &BookUpdateInput) -> Result<(), Box<dyn std::error::Error>>;
+    async fn update(&self, id: &Uuid, input: &BookUpdateInput) -> Result<(), Box<dyn std::error::Error>>;
 }
 
 #[async_trait]
