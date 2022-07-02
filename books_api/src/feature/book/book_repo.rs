@@ -18,6 +18,8 @@ pub struct BookDto {
     pub id: sqlx::types::Uuid,
     pub name: String,
     pub url: Option<String>,
+    pub published_year: Option<i32>,
+    pub original_published_year: Option<i32>,
 }
 
 impl BookDto {
@@ -29,6 +31,8 @@ impl BookDto {
                 Some(url) => Some(url.to_string()),
                 None => None,
             },
+            published_year: None,
+            original_published_year: None,
         };
         Ok(dto)
     }
@@ -53,12 +57,21 @@ impl BookDto {
 impl BookRepo for PostgresBookRepo {
     async fn create(&self, book: &Book) -> Result<(), Box<dyn Error>> {
         let dto = BookDto::new(book)?;
+        let _ = sqlx::query!("INSERT INTO books (id, name) VALUES ($1, $2)", &dto.id, &dto.name)
+            .execute(&*self.pg_pool)
+            .await?;
         if dto.url.is_some() {
-            let _ = sqlx::query!("INSERT INTO books (id, name, url) VALUES ($1, $2, $3)", &dto.id, &dto.name, &dto.url.unwrap())
+            let _ = sqlx::query!("UPDATE books SET url = $1 WHERE id = $2", &dto.url.unwrap(), &dto.id)
                 .execute(&*self.pg_pool)
                 .await?;
-        } else {
-            let _ = sqlx::query!("INSERT INTO books (id, name) VALUES ($1, $2)", &dto.id, &dto.name)
+        }
+        if dto.published_year.is_some() {
+            let _ = sqlx::query!("UPDATE books SET published_year = $1 WHERE id = $2", &dto.published_year.unwrap(), &dto.id)
+                .execute(&*self.pg_pool)
+                .await?;
+        }
+        if dto.original_published_year.is_some() {
+            let _ = sqlx::query!("UPDATE books SET original_published_year = $1 WHERE id = $2", &dto.original_published_year.unwrap(), &dto.id)
                 .execute(&*self.pg_pool)
                 .await?;
         }
@@ -67,7 +80,7 @@ impl BookRepo for PostgresBookRepo {
 
     async fn find_one(&self, id: &Uuid) -> Result<Book, Box<dyn Error>> {
         let uid = sqlx::types::Uuid::from_bytes(*id.as_bytes());
-        let res = sqlx::query_as!(BookDto, "SELECT * FROM books WHERE id = $1", &uid)
+        let res = sqlx::query_as!(BookDto, "SELECT id, name, url, published_year, original_published_year FROM books WHERE id = $1", &uid)
             .fetch_one(&*self.pg_pool)
             .await;
         match res {
