@@ -38,4 +38,5 @@ pub trait BookService {
 pub trait BookRepo {
     async fn create(&self, book: &Book) -> Result<(), Box<dyn std::error::Error>>;
     async fn find_one(&self, id: &Uuid) -> Result<Book, Box<dyn std::error::Error>>;
+    async fn find_all(&self, id: &Uuid) -> Result<BookList, Box<dyn std::error::Error>>;
 }

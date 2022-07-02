@@ -7,7 +7,7 @@ use sqlx::PgPool;
 use url::Url;
 use uuid::Uuid;
 
-use crate::feature::book::ports::{Book, BookRepo};
+use crate::feature::book::ports::{Book, BookList, BookRepo};
 
 pub struct PostgresBookRepo {
     pub pg_pool: Arc<PgPool>,
@@ -53,6 +53,8 @@ impl BookDto {
     }
 }
 
+type BookDtoList = Vec<BookDto>;
+
 #[async_trait]
 impl BookRepo for PostgresBookRepo {
     async fn create(&self, book: &Book) -> Result<(), Box<dyn Error>> {
@@ -89,13 +91,13 @@ impl BookRepo for PostgresBookRepo {
         }
     }
 
-    async fn find_all(&self, id: &Uuid) -> Result<Book, Box<dyn Error>> {
+    async fn find_all(&self, id: &Uuid) -> Result<BookList, Box<dyn Error>> {
         let uid = sqlx::types::Uuid::from_bytes(*id.as_bytes());
-        let res = sqlx::query_as!(BookDto, "SELECT id, name, url, published_year, original_published_year FROM books WHERE id = $1", &uid)
-            .fetch_one(&*self.pg_pool)
+        let res = sqlx::query_as!(BookDto, "SELECT id, name, url, published_year, original_published_year FROM books ORDER BY updated_at DESC LIMIT 10")
+            .fetch_all(&*self.pg_pool)
             .await;
         match res {
-            Ok(b) => Ok(b.to_model()),
+            Ok(bs) => Ok(bs.iter().map(|book| book.to_model()).collect()),
             Err(e) => Err(Box::from(e))
         }
     }
