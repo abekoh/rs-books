@@ -18,11 +18,29 @@ struct BookListProps {
 
 #[function_component(BooksList)]
 fn books_list(BookListProps { books }: &BookListProps) -> Html {
-    books.iter().map(|book| {
+    let book_lines: Html = books.iter().map(|book| {
         html! {
-            <p>{book.name.clone()}</p>
+            <tr>
+                <td>{ book.id }</td>
+                <td>{ book.name.clone() }</td>
+                <td>{ for book.url.clone() }</td>
+            </tr>
         }
-    }).collect()
+    }).collect();
+    html! {
+        <table>
+            <thead>
+                <tr>
+                    <th>{ "ID" }</th>
+                    <th>{ "Name" }</th>
+                    <th>{ "URL" }</th>
+                </tr>
+            </thead>
+            <tbody>
+                {book_lines}
+            </tbody>
+        </table>
+    }
 }
 
 #[function_component(App)]
