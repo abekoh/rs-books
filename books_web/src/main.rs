@@ -1,8 +1,9 @@
+use reqwasm::http::Request;
 use serde::Deserialize;
 use url::Url;
 use uuid::Uuid;
 use yew::prelude::*;
-use reqwasm::http::Request;
+use yew_router::prelude::*;
 
 #[derive(Clone, PartialEq, Deserialize)]
 struct Book {
@@ -46,8 +47,8 @@ fn books_list(BookListProps { books }: &BookListProps) -> Html {
     }
 }
 
-#[function_component(App)]
-fn app() -> Html {
+#[function_component(Home)]
+fn home() -> Html {
     let books = use_state(|| vec![]);
     {
         let books = books.clone();
@@ -73,6 +74,31 @@ fn app() -> Html {
                 <BooksList books={(*books).clone()} />
             </div>
         </>
+    }
+}
+
+#[derive(Clone, Routable, PartialEq)]
+enum Route {
+    #[at("/")]
+    Home,
+    #[not_found]
+    #[at("/404")]
+    NotFound,
+}
+
+fn switch(routes: &Route) -> Html {
+    match routes {
+        Route::Home => html! { <Home/> },
+        Route::NotFound => html! { <h1>{ "404" }</h1> },
+    }
+}
+
+#[function_component(App)]
+fn app() -> Html {
+    html! {
+        <BrowserRouter>
+            <Switch<Route> render={Switch::render(switch)} />
+        </BrowserRouter>
     }
 }
 
