@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use actix_cors::Cors;
 
 use actix_web::{App, HttpServer, web};
 use actix_web::middleware::Logger;
@@ -20,7 +21,9 @@ async fn main() -> std::io::Result<()> {
     let pg_pool = Arc::new(infrastructure::postgres::configure().await);
 
     HttpServer::new(move || {
+        let cors = Cors::default().allowed_origin("http://localhost:8080");
         App::new()
+            .wrap(cors)
             .wrap(Logger::default())
             .configure(|cfg| configure_features(pg_pool.clone(), cfg))
     })
