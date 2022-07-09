@@ -26,7 +26,14 @@ fn books_list(BookListProps { books }: &BookListProps) -> Html {
 
 #[function_component(App)]
 fn app() -> Html {
-    let books: Vec<Book> = vec![];
+    let books: Vec<Book> = vec![
+        Book {
+            name: String::from("hoge"),
+        },
+        Book {
+            name: String::from("fuga"),
+        },
+    ];
     html! {
         <>
             <h1>{ "Books" }</h1>
