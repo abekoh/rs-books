@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .configure(|cfg| configure_features(pg_pool.clone(), cfg))
     })
-        .bind(("127.0.0.1", 8080))?
+        .bind(("127.0.0.1", 8090))?
         .run()
         .await
 }
