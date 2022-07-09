@@ -3,6 +3,7 @@ use url::Url;
 use uuid::Uuid;
 use yew::prelude::*;
 use reqwasm::http::Request;
+use yew::html::IntoPropValue;
 
 #[derive(Clone, PartialEq, Deserialize)]
 struct Book {
@@ -20,10 +21,10 @@ struct BookListProps {
 fn books_list(BookListProps { books }: &BookListProps) -> Html {
     let book_lines: Html = books.iter().map(|book| {
         html! {
-            <tr>
+            <tr key={ book.id.to_string() }>
                 <td>{ book.id }</td>
                 <td>{ book.name.clone() }</td>
-                <td>{ for book.url.clone() }</td>
+                <td><a href={ book.url.clone().unwrap().to_string() }>{ for book.url.clone() }</a></td>
             </tr>
         }
     }).collect();
