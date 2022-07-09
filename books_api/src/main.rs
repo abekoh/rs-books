@@ -11,7 +11,7 @@ mod feature;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "info");
+    std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
 
     if let Err(e) = dotenv::dotenv() {
@@ -21,7 +21,7 @@ async fn main() -> std::io::Result<()> {
     let pg_pool = Arc::new(infrastructure::postgres::configure().await);
 
     HttpServer::new(move || {
-        let cors = Cors::default().allowed_origin("http://localhost:8080");
+        let cors = Cors::permissive(); // FIXME: replace
         App::new()
             .wrap(cors)
             .wrap(Logger::default())
