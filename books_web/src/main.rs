@@ -27,18 +27,6 @@ fn books_list(BookListProps { books }: &BookListProps) -> Html {
 
 #[function_component(App)]
 fn app() -> Html {
-    // let books: Vec<Book> = vec![
-    //     Book {
-    //         id: Uuid::new_v4(),
-    //         name: String::from("hoge"),
-    //         url: None,
-    //     },
-    //     Book {
-    //         id: Uuid::new_v4(),
-    //         name: String::from("fuga"),
-    //         url: None,
-    //     },
-    // ];
     let books = use_state(|| vec![]);
     {
         let books = books.clone();
