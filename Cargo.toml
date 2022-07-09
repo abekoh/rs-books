@@ -1,4 +1,5 @@
 [workspace]
 members = [
     "books_api",
+    "books_web",
 ]
